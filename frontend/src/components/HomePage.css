@@ -189,3 +189,30 @@ tr:hover {
   font-size: 1.1em;
   color: #2c3e50;
 }
+
+.go-to-page {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.go-to-page input {
+  width: 60px;
+  padding: 0.25rem 0.5rem;
+  margin-right: 0.5rem;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+}
+
+.go-to-page button {
+  padding: 0.25rem 0.5rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.go-to-page button:hover {
+  background-color: #2980b9;
+}

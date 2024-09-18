@@ -12,6 +12,7 @@ function HomePage() {
   const [page, setPage] = useState(0);
   const [pagination, setPagination] = useState({ currentPage: 0, totalPages: 1 });
   const navigate = useNavigate();
+  const [goToPage, setGoToPage] = useState('');
 
   const fetchFlights = useCallback(async () => {
     setLoading(true);
@@ -44,11 +45,10 @@ function HomePage() {
     setPage(prevPage => Math.max(0, prevPage - 1));
   };
 
-  const formatTime = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid Date';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formatDateTime = (dateTimeString) => {
+    if (!dateTimeString) return 'N/A';
+    const date = new Date(dateTimeString);
+    return date.toLocaleString();
   };
 
   const makeReservation = async (flightId) => {
@@ -62,6 +62,16 @@ function HomePage() {
       } else {
         alert('Failed to make reservation. Please try again.');
       }
+    }
+  };
+
+  const handleGoToPage = () => {
+    const pageNumber = parseInt(goToPage, 10);
+    if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > pagination.totalPages) {
+      alert(`Please enter a valid page number between 1 and ${pagination.totalPages}`);
+    } else {
+      setPage(pageNumber - 1); // API uses 0-based indexing
+      setGoToPage('');
     }
   };
 
@@ -100,6 +110,7 @@ function HomePage() {
                 <th>Number</th>
                 <th>Destination</th>
                 <th>Scheduled Time</th>
+                <th>Estimated Time</th>
                 <th>Gate</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -111,8 +122,9 @@ function HomePage() {
                   <td>{flight.flightName}</td>
                   <td>{flight.flightNumber}</td>
                   <td>{flight.route.destinations[0]}</td>
-                  <td>{formatTime(flight.scheduleTime)}</td>
-                  <td>{flight.gate || 'TBA'}</td>
+                  <td>{formatDateTime(flight.scheduleDateTime)}</td>
+                  <td>{formatDateTime(flight.estimatedLandingTime)}</td>
+                  <td>{flight.gate ? flight.gate : 'Not assigned'}</td>
                   <td>{flight.publicFlightState.flightStates[0]}</td>
                   <td>
                     <button onClick={() => makeReservation(flight.id)}>Reserve</button>
@@ -125,6 +137,17 @@ function HomePage() {
             <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
             <span>Page {pagination.currentPage + 1} of {pagination.totalPages}</span>
             <button onClick={handleNextPage} disabled={pagination.currentPage + 1 >= pagination.totalPages}>Next</button>
+            <div className="go-to-page">
+              <input
+                type="number"
+                value={goToPage}
+                onChange={(e) => setGoToPage(e.target.value)}
+                min="1"
+                max={pagination.totalPages}
+                placeholder="Page #"
+              />
+              <button onClick={handleGoToPage}>Go</button>
+            </div>
           </div>
         </div>
       )}
